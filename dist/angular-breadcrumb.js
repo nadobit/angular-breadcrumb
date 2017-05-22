@@ -1,6 +1,6 @@
-/*! angular-breadcrumb - v0.4.1-dev-2016-04-12
+/*! angular-breadcrumb - v0.5.0-dev-2017-05-23
 * http://ncuillery.github.io/angular-breadcrumb
-* Copyright (c) 2016 Nicolas Cuillery; Licensed MIT */
+* Copyright (c) 2017 Nicolas Cuillery; Licensed MIT */
 
 (function (window, angular, undefined) {
 'use strict';
@@ -210,7 +210,7 @@ var deregisterWatchers = function(labelWatcherArray) {
     });
 };
 
-function BreadcrumbDirective($interpolate, $breadcrumb, $rootScope) {
+function BreadcrumbDirective($interpolate, $breadcrumb, $rootScope, $injector) {
     var $$templates = {
         bootstrap2: '<ul class="breadcrumb">' +
             '<li ng-repeat="step in steps" ng-switch="$last || !!step.abstract" ng-class="{active: $last}">' +
@@ -249,7 +249,9 @@ function BreadcrumbDirective($interpolate, $breadcrumb, $rootScope) {
                             step.ncyBreadcrumbLabel = parseLabel(viewScope);
                             // Watcher for further viewScope updates
                             registerWatchers(labelWatchers, parseLabel, viewScope, step);
-                        } else {
+                        } else if (step.ncyBreadcrumb && step.ncyBreadcrumb.labelFn) {
+                            step.ncyBreadcrumbLabel = $injector.invoke(step.ncyBreadcrumb.labelFn);
+                        } else {
                             step.ncyBreadcrumbLabel = step.name;
                         }
                     });
@@ -267,7 +269,7 @@ function BreadcrumbDirective($interpolate, $breadcrumb, $rootScope) {
         }
     };
 }
-BreadcrumbDirective.$inject = ['$interpolate', '$breadcrumb', '$rootScope'];
+BreadcrumbDirective.$inject = ['$interpolate', '$breadcrumb', '$rootScope', '$injector'];
 
 function BreadcrumbLastDirective($interpolate, $breadcrumb, $rootScope) {
     var $$templates = {
