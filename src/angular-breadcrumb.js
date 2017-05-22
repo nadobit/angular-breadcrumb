@@ -205,7 +205,7 @@ var deregisterWatchers = function(labelWatcherArray) {
     });
 };
 
-function BreadcrumbDirective($interpolate, $breadcrumb, $rootScope) {
+function BreadcrumbDirective($interpolate, $breadcrumb, $rootScope, $injector) {
     var $$templates = {
         bootstrap2: '<ul class="breadcrumb">' +
             '<li ng-repeat="step in steps" ng-switch="$last || !!step.abstract" ng-class="{active: $last}">' +
@@ -244,7 +244,9 @@ function BreadcrumbDirective($interpolate, $breadcrumb, $rootScope) {
                             step.ncyBreadcrumbLabel = parseLabel(viewScope);
                             // Watcher for further viewScope updates
                             registerWatchers(labelWatchers, parseLabel, viewScope, step);
-                        } else {
+                        } else if (step.ncyBreadcrumb && step.ncyBreadcrumb.labelFn) {
+                            step.ncyBreadcrumbLabel = $injector.invoke(step.ncyBreadcrumb.labelFn);
+                        } else {
                             step.ncyBreadcrumbLabel = step.name;
                         }
                     });
@@ -262,7 +264,7 @@ function BreadcrumbDirective($interpolate, $breadcrumb, $rootScope) {
         }
     };
 }
-BreadcrumbDirective.$inject = ['$interpolate', '$breadcrumb', '$rootScope'];
+BreadcrumbDirective.$inject = ['$interpolate', '$breadcrumb', '$rootScope', '$injector'];
 
 function BreadcrumbLastDirective($interpolate, $breadcrumb, $rootScope) {
     var $$templates = {
